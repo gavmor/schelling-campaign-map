@@ -58,7 +58,11 @@ Emit the point-crawl as **G = (V, E_A, E_F, E_C)** — see `references/typed_gra
 
 When there is no board or map to survey — e.g. building a map from a prose setting — the survey step is replaced. (With a board, N is discovered from the survey; the budget below governs the sourceless path only. Full pipeline: `references/architectural-campaign-design.md`.)
 
-- **Node budget** (essay Phase 1): N ≥ 25 — below that, the graph is too small for typed-edge mechanics (coasts, blockades, choke points) to matter. 75, the Diplomacy scale, is the preferred target for a full campaign. Split roughly 60/40 — M ≈ 0.6N supply centers, K ≈ 0.4N non-supply (wilds, waters, neutral waypoint cells). N counts every cell on the canvas, water included, so M + K = N must close. (The essay says "land regions" but K explicitly includes ocean cells — budget the whole canvas.) Waypoints are neutral ground: carve them from the non-supply share, never from M.
+- **Node budget** (essay Phase 1): N ≥ 25 — below that, the graph is too small for typed-edge mechanics (coasts, blockades, choke points) to matter. 75, the Diplomacy scale, is the preferred target for a full campaign. Then choose strategic density d = M/N from campaign scope:
+  - **d ≈ 0.45 (Diplomacy-like, default):** standard great-power friction. ~34 supply centers at N=75.
+  - **d ≈ 0.6 (dense):** high quest density, every region matters.
+  - **d ≈ 0.2–0.3 (sparse frontier):** a few key locations in vast wilds; exploration over politics.
+  K = N − M covers wilds, waters, impassables, and neutral waypoint cells. N counts every cell on the canvas, water included, so M + K = N must close. (The essay says "land regions" but K explicitly includes ocean cells — budget the whole canvas.) Waypoints are neutral ground: carve them from the non-supply share, never from M.
 - **Poisson-disc sampling** (Bridson's algorithm; Lloyd's Relaxation is the essay's named alternative) generates the seeds: an even, non-overlapping distribution with a minimum separation radius. Pick the radius so the region count fits comfortably (for 75 regions in the unit square, r ≈ 0.1).
 - **Semantic anchoring:** assign each sampled point to the named region whose authorial anchor position it lies nearest to — greedy nearest-anchor matching, in seed order (supply centers, then wilds/waters, then waypoints). The map keeps its intended geography (mines west, storm north) while the cells stay balanced and readable.
 - Names still come from the source text — never invent toponyms.
@@ -77,7 +81,7 @@ The map's edge cells are the campaign's horizons. A ring of generic ocean and wi
 
 **The edge test:** Cover the center of the map and read only the edge cells. If the campaign still sounds interesting from the edges alone, the geography works. If the edges are interchangeable, redistribute seeds or rename with intent.
 
-**In the pipeline (sourceless path):** When assigning semantic anchors, place at least 2–3 supply-center anchors in the outer third of the canvas. If the 40% non-supply share clusters at the boundary, that's the boring ring — break it up by swapping a wild/water anchor with a supply anchor.
+**In the pipeline (sourceless path):** When assigning semantic anchors, place at least 2–3 supply-center anchors in the outer third of the canvas. If the non-supply share clusters at the boundary, that's the boring ring — break it up by swapping a wild/water anchor with a supply anchor.
 
 ## Output Contract
 
