@@ -46,19 +46,20 @@ Write points as structured data: name, kind, `(fx, fy)`, one-line provenance. Na
 
 ## Without a source image
 
-When there is no board or map to survey — e.g. building a map from a prose setting — the survey step is replaced:
+When there is no board or map to survey — e.g. building a map from a prose setting — the survey step is replaced. (With a board, N is discovered from the survey; the budget below governs the sourceless path only. Full pipeline: `references/architectural-campaign-design.md`.)
 
-- **Poisson-disc sampling** (Bridson's algorithm) generates the seeds: an even, non-overlapping distribution with a minimum separation radius. Pick the radius so the region count fits comfortably (for ~14 regions in the unit square, r ≈ 0.2).
+- **Node budget** (essay Phase 1): choose total regions N from campaign scope, then split roughly 60/40 — M ≈ 0.6N supply centers, K ≈ 0.4N non-supply (wilds, waters, neutral waypoint cells). N counts every cell on the canvas, water included, so M + K = N must close. (The essay says "land regions" but K explicitly includes ocean cells — budget the whole canvas.) Waypoints are neutral ground: carve them from the non-supply share, never from M.
+- **Poisson-disc sampling** (Bridson's algorithm; Lloyd's Relaxation is the essay's named alternative) generates the seeds: an even, non-overlapping distribution with a minimum separation radius. Pick the radius so the region count fits comfortably (for ~14 regions in the unit square, r ≈ 0.2).
 - **Semantic anchoring:** assign each sampled point to the named region whose authorial anchor position it lies nearest to — greedy nearest-anchor matching, in seed order (supply centers, then wilds/waters, then waypoints). The map keeps its intended geography (mines west, storm north) while the cells stay balanced and readable.
 - Names still come from the source text — never invent toponyms.
-- Record the method in `*_data.py` as the provenance: algorithm, radius, point count, and the anchor list. The even-distribution property replaces the measured-placement claim; the verify gate still checks names-against-source and in-bounds seeds.
+- Record the method in `*_data.py` as the provenance: algorithm, radius, point count, node budget (N/M/K), and the anchor list. The even-distribution property replaces the measured-placement claim; the verify gate still checks names-against-source and in-bounds seeds.
 
 ## Output Contract
 
 - `*_data.py`: survey output (names, kinds, coordinates, provenance).
 - `*_pipeline.py`: Voronoi + render.
 - `*_map.png`: the campaign map. `*_summary.json`: region list.
-- Optional: quest matrix, faction claims — only if the campaign needs them.
+- Optional: point-crawl adjacency graph (essay Phase 3) — seeds as vertices, shared Voronoi borders as edges, pruned for impassable water. Quest matrix, faction claims — only if the campaign needs them.
 
 ## Operating Rules
 
