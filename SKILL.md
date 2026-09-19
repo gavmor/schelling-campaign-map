@@ -54,6 +54,21 @@ When there is no board or map to survey — e.g. building a map from a prose set
 - Names still come from the source text — never invent toponyms.
 - Record the method in `*_data.py` as the provenance: algorithm, radius, point count, node budget (N/M/K), and the anchor list. The even-distribution property replaces the measured-placement claim; the verify gate still checks names-against-source and in-bounds seeds.
 
+## Interesting geography (no boring edges)
+
+The map's edge cells are the campaign's horizons. A ring of generic ocean and wilderness around an interesting middle makes the world feel small — an island of content in a sea of nothing. Every edge cell must earn its place.
+
+**Rules:**
+
+1. **Distribute, don't ring.** Supply centers belong across the whole canvas, including near the boundary. Port cities, border fortresses, frontier outposts — these give the edges purpose. Don't cluster all M supply centers in the center.
+2. **Name every edge cell with intent.** "Ocean" and "Forest" are filler. "The Shattered Coast" and "The Howling Waste" are promises of content. If two edge cells could swap names without anyone noticing, they're filler.
+3. **Give edge water a role.** Coastlines are natural, but the water should *do* something: trade routes, naval hazards, island chains, a far shore with a rumor attached. Not just blue filler.
+4. **Edge wilds are the frontier.** The wilderness at the boundary is where the unknown begins. It needs a reputation — a danger, a mystery, a reason to venture in or a reason to fear it.
+
+**The edge test:** Cover the center of the map and read only the edge cells. If the campaign still sounds interesting from the edges alone, the geography works. If the edges are interchangeable, redistribute seeds or rename with intent.
+
+**In the pipeline (sourceless path):** When assigning semantic anchors, place at least 2–3 supply-center anchors in the outer third of the canvas. If the 40% non-supply share clusters at the boundary, that's the boring ring — break it up by swapping a wild/water anchor with a supply anchor.
+
 ## Output Contract
 
 - `*_data.py`: survey output (names, kinds, coordinates, provenance).
