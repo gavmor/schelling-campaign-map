@@ -44,6 +44,16 @@ Write points as structured data: name, kind, `(fx, fy)`, one-line provenance. Na
 - Waypoints are **neutral**: never claimed, never quest hosts. They buffer borders.
 - Render every marker **exactly at its seed**, never at cell centroids.
 
+### 3b. Type the graph (multiplex edges)
+
+Emit the point-crawl as **G = (V, E_A, E_F, E_C)** — see `references/typed_graph.md`, `bin/graph_model.py`:
+
+- **E_A (army/land):** borders between non-sea, non-impassable cells. Overland movement.
+- **E_F (fleet/sea):** borders touching a sea cell, routed via coast subnodes. A coastal parent touching 2+ disconnected sea regions splits per region (Spain → Spain/North Coast, Spain/South Coast) so fleets can't cross landmasses; the parent keeps ownership, supply-center status, and E_A adjacency.
+- **E_C (conditional):** authored, not derived — portals, convoy routes, seasonal passes. Carry `conditions` + `is_active`; off until campaign events flip them.
+- **Node taxonomy:** `space_type` ∈ {inland, coastal, sea, impassable} × campaign role ∈ {supply, waypoint, wild}. `impassable` is the Switzerland pattern: blocks every layer, forces choke points.
+- Bind quest content on the node: `matrix_cells` (5×5 intersections) and `dungeon_template` (5-room) live on the node, so entering a cell exposes its dungeon and triggers its matrix step.
+
 ## Without a source image
 
 When there is no board or map to survey — e.g. building a map from a prose setting — the survey step is replaced. (With a board, N is discovered from the survey; the budget below governs the sourceless path only. Full pipeline: `references/architectural-campaign-design.md`.)
@@ -88,3 +98,4 @@ The map's edge cells are the campaign's horizons. A ring of generic ocean and wi
 
 - `bin/survey.py` — crop/overlay helpers for the manual measure-and-verify loop.
 - `bin/survey_auto.py` — headless detect + verify. `detect --board <img>` finds candidate squares by HSV color/shape; `verify --board <img>` checks every seed sits on the right color. Exits non-zero on failure. Tune `HSV_RANGES` per board.
+- `bin/graph_model.py` — multiplex graph dataclasses (Node, Edge, E_A/E_F/E_C layers, coast-subnode splitting, JSON round-trip) plus `derive_layers()` / `split_coasts()` to type raw Voronoi adjacency.
