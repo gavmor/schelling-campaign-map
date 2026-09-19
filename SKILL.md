@@ -66,6 +66,7 @@ When there is no board or map to survey — e.g. building a map from a prose set
 - **Poisson-disc sampling** (Bridson's algorithm; Lloyd's Relaxation is the essay's named alternative) generates the seeds: an even, non-overlapping distribution with a minimum separation radius. Pick the radius so the region count fits comfortably (for 75 regions in the unit square, r ≈ 0.1).
 - **Semantic anchoring:** assign each sampled point to the named region whose authorial anchor position it lies nearest to — greedy nearest-anchor matching, in seed order (supply centers, then wilds/waters, then waypoints). The map keeps its intended geography (mines west, storm north) while the cells stay balanced and readable.
 - Names still come from the source text — never invent toponyms.
+- Fleshing out 75+ place names by hand is the hard part of the sourceless path. Generate them with [dunmanifestin](https://github.com/gavmor/dunmanifestin) (palette-based madlib engine, `gem install dunmanifestin`) — build a genre palette for the setting and manifest names in bulk, then curate: keep the ones that sound like promises of content, drop the filler. The verify gate still checks names-against-source where a source exists.
 - Record the method in `*_data.py` as the provenance: algorithm, radius, point count, node budget (N/M/K), and the anchor list. The even-distribution property replaces the measured-placement claim; the verify gate still checks names-against-source and in-bounds seeds.
 
 ## Interesting geography (no boring edges)
