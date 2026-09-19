@@ -27,6 +27,12 @@ from graph_model import (DiplomacyMultiplexGraph, Node, Edge, SpaceType,
                          CampaignRole, LayerType, derive_layers, split_coasts,
                          to_json)
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from dunmanifestin import build_engine, titleize
+
+# One engine for all three maps: the churn keeps every manifested name unique.
+ENG = build_engine(seed=20260919)
+
 OUT = os.path.dirname(os.path.abspath(__file__))
 rng = np.random.default_rng(20260919)
 
@@ -127,26 +133,38 @@ def adjacency(vor, n):
     return sorted(adj)
 
 
-# ---------------------------------------------------------------- names (sample-quality)
+# ---------------------------------------------------------------- names via dunmanifestin palettes
 
-SUPPLY_A = ["Ash", "Thorn", "Ember", "Frost", "Stone", "Raven", "Wolf", "Storm",
-            "Grim", "Oak", "Iron", "Silver", "Gold", "Copper", "Flint", "Moss",
-            "Birch", "Alder", "Hazel", "Rowan", "Elm", "Yew", "Ashen", "Barrow"]
-SUPPLY_B = ["hold", "ford", "gate", "haven", "watch", "moor", "fell", "shire",
-            "burg", "holm", "stead", "wick", "mouth", "crest", "hollow", "ridge"]
-SEAS = ["the Shattered Sea", "the Howling Deep", "the Ashen Expanse",
-        "the Silent Tide", "the Wreckwater", "the Pale Reach"]
-WILDS = ["Thornwood", "the Gray Wastes", "the Murmuring Fen", "Cindersteppe",
-         "the Hollow Hills", "the Weeping Marsh", "the Ironwood", "the Dustveil"]
-IMPASSABLE = ["the Godspine"]
+def _curated(template_options, tries=30, min_len=6):
+    """Manifest from placeName with a chosen template; the palettes' bare
+    [word] template is too terse for a supply center, so prefer compounds.
+    (This curation is the documented workflow: keep promises, drop filler.)
+    Final labels are title-cased for the map; the engine itself is case-neutral."""
+    for _ in range(tries):
+        tmpl = ENG.rng.choice(template_options)
+        n = ENG.manifest("placeName", phrase=tmpl)
+        if len(n) >= min_len and n.replace("-", "").replace(" ", "").isalpha():
+            return titleize(n)
+    return titleize(ENG.manifest("placeName"))
 
 
-def supply_names(n):
-    names, i = [], 0
-    while len(names) < n:
-        names.append(f"{SUPPLY_A[i % len(SUPPLY_A)]}{SUPPLY_B[(i // len(SUPPLY_A)) % len(SUPPLY_B)]}".capitalize())
-        i += 1
-    return names
+def supply_name():
+    return _curated(["[namePrefix][placeSuffix]", "[word][placeSuffix]"])
+
+
+def wild_name():
+    return titleize(_curated(["[word][placeSuffix]", "[namePrefix][placeSuffix]",
+                     "[word]-[word]"], min_len=5))
+
+
+def sea_name():
+    w = titleize(ENG.manifest("word"))
+    kind = ENG.rng.choice(["Sea", "Deep", "Reach", "Expanse"])
+    return f"the {w} {kind}"
+
+
+def impassable_name():
+    return f"the {titleize(ENG.manifest('word'))} Spine"
 
 
 # ---------------------------------------------------------------- build one sample
@@ -218,20 +236,19 @@ def build_sample(key, ratios, title):
                "sea": CampaignRole.WILD, "wild": CampaignRole.WILD,
                "impassable": CampaignRole.WILD}
 
-    snames = supply_names(n_supply)
     nodes = {}
-    si = wi = seai = 0
+    wi = 0
     for i in range(N):
         if kind[i] == "supply":
-            nm = snames[si]; si += 1
+            nm = supply_name()
         elif kind[i] == "sea":
-            nm = SEAS[seai % len(SEAS)]; seai += 1
+            nm = sea_name()
         elif kind[i] == "impassable":
-            nm = IMPASSABLE[0]
+            nm = impassable_name()
         elif kind[i] == "waypoint":
             nm = f"waypoint-{wi + 1}"; wi += 1
         else:
-            nm = WILDS[i % len(WILDS)] if edge_cell[i] else f"wild-{i}"
+            nm = wild_name()
         nodes[f"n{i}"] = Node(
             id=f"n{i}", name=nm, space_type=space[i],
             campaign_role=role_of[kind[i]],
